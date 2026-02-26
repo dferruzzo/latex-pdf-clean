@@ -42,12 +42,13 @@ If Docker needs `sudo` on your machine, either run with `sudo` or add your user 
 ## Usage
 
 ```bash
-./latex-pdf-clean [-log] <file.tex>
+./latex-pdf-clean [-log] [-keep] <file.tex>
 ```
 
 ### Options
 
 - `-log`: keep the generated `.log` file
+- `-keep`: keep all generated files (skip cleanup after compile)
 
 ## What it does
 
@@ -69,6 +70,8 @@ If Docker needs `sudo` on your machine, either run with `sudo` or add your user 
 	- `.bbl`, `.blg`, `.bcf`, `.run.xml`
 	- `.log` (unless `-log` is used)
 
+   If `-keep` is used, no files are removed.
+
 ## Output
 
 - Always prints the full path to the generated PDF.
@@ -86,6 +89,12 @@ Compile and keep log:
 
 ```bash
 ./latex-pdf-clean -log report.tex
+```
+
+Compile and keep all generated files:
+
+```bash
+./latex-pdf-clean -keep report.tex
 ```
 
 ## Error cases

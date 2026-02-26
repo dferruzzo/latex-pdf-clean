@@ -2,6 +2,7 @@
 set -euo pipefail
 
 keep_log=false
+keep_all=false
 input_tex=""
 
 while [[ $# -gt 0 ]]; do
@@ -10,15 +11,19 @@ while [[ $# -gt 0 ]]; do
       keep_log=true
       shift
       ;;
+    -keep)
+      keep_all=true
+      shift
+      ;;
     -*)
       echo "Error: unknown option: $1" >&2
-      echo "Usage: $(basename "$0") [-log] <file.tex>" >&2
+      echo "Usage: $(basename "$0") [-log] [-keep] <file.tex>" >&2
       exit 1
       ;;
     *)
       if [[ -n "$input_tex" ]]; then
         echo "Error: only one .tex file can be provided" >&2
-        echo "Usage: $(basename "$0") [-log] <file.tex>" >&2
+        echo "Usage: $(basename "$0") [-log] [-keep] <file.tex>" >&2
         exit 1
       fi
       input_tex="$1"
@@ -28,7 +33,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "$input_tex" ]]; then
-  echo "Usage: $(basename "$0") [-log] <file.tex>" >&2
+  echo "Usage: $(basename "$0") [-log] [-keep] <file.tex>" >&2
   exit 1
 fi
 
@@ -54,26 +59,30 @@ fi
 # Compile in the TeX file directory, regardless of current shell directory.
 docker run --rm -v "$tex_abs_dir:/data" blang/latex pdflatex "$tex_file"
 
-# Keep only the PDF and source files.
-rm -f \
-  "$tex_abs_dir/$tex_name.aux" \
-  "$tex_abs_dir/$tex_name.nav" \
-  "$tex_abs_dir/$tex_name.out" \
-  "$tex_abs_dir/$tex_name.snm" \
-  "$tex_abs_dir/$tex_name.toc" \
-  "$tex_abs_dir/$tex_name.vrb" \
-  "$tex_abs_dir/$tex_name.fls" \
-  "$tex_abs_dir/$tex_name.fdb_latexmk" \
-  "$tex_abs_dir/$tex_name.synctex.gz" \
-  "$tex_abs_dir/$tex_name.bbl" \
-  "$tex_abs_dir/$tex_name.blg" \
-  "$tex_abs_dir/$tex_name.bcf" \
-  "$tex_abs_dir/$tex_name.run.xml"
+if [[ "$keep_all" != true ]]; then
+  # Keep only the PDF and source files.
+  rm -f \
+    "$tex_abs_dir/$tex_name.aux" \
+    "$tex_abs_dir/$tex_name.nav" \
+    "$tex_abs_dir/$tex_name.out" \
+    "$tex_abs_dir/$tex_name.snm" \
+    "$tex_abs_dir/$tex_name.toc" \
+    "$tex_abs_dir/$tex_name.vrb" \
+    "$tex_abs_dir/$tex_name.fls" \
+    "$tex_abs_dir/$tex_name.fdb_latexmk" \
+    "$tex_abs_dir/$tex_name.synctex.gz" \
+    "$tex_abs_dir/$tex_name.bbl" \
+    "$tex_abs_dir/$tex_name.blg" \
+    "$tex_abs_dir/$tex_name.bcf" \
+    "$tex_abs_dir/$tex_name.run.xml"
+fi
 
 if [[ "$keep_log" == true ]]; then
   echo "$tex_abs_dir/$tex_name.pdf"
   echo "$tex_abs_dir/$tex_name.log"
 else
-  rm -f "$tex_abs_dir/$tex_name.log"
+  if [[ "$keep_all" != true ]]; then
+    rm -f "$tex_abs_dir/$tex_name.log"
+  fi
   echo "$tex_abs_dir/$tex_name.pdf"
 fi
