@@ -9,6 +9,36 @@ Small Bash utility to compile a single `.tex` file to PDF using Docker (`blang/l
 - A local `.tex` file
 - Docker image: `blang/latex` (pulled automatically by Docker if needed)
 
+## Install on Linux (after cloning)
+
+From the project folder:
+
+```bash
+chmod +x latex-pdf-clean
+```
+
+### Option 1: use it from this folder
+
+Run with:
+
+```bash
+./latex-pdf-clean your-file.tex
+```
+
+### Option 2: install system-wide
+
+```bash
+sudo install -m 755 latex-pdf-clean /usr/local/bin/latex-pdf-clean
+```
+
+Then run from anywhere:
+
+```bash
+latex-pdf-clean your-file.tex
+```
+
+If Docker needs `sudo` on your machine, either run with `sudo` or add your user to the `docker` group.
+
 ## Usage
 
 ```bash
