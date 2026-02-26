@@ -1,26 +1,34 @@
 #!/usr/bin/env bash
+# latex-pdf-clean: Compile LaTeX files to PDF using Docker, then clean up intermediate files
+
 set -euo pipefail
 
-keep_log=false
-keep_all=false
-input_tex=""
+# Initialize flags and variables
+keep_log=false          # Whether to keep the .log file
+keep_all=false          # Whether to keep all intermediate files
+input_tex=""            # The input .tex file path
 
+# Parse command-line arguments
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -log)
+      # Keep the LaTeX log file after compilation
       keep_log=true
       shift
       ;;
     -keep)
+      # Keep all intermediate build files
       keep_all=true
       shift
       ;;
     -*)
+      # Unknown option
       echo "Error: unknown option: $1" >&2
       echo "Usage: $(basename "$0") [-log] [-keep] <file.tex>" >&2
       exit 1
       ;;
     *)
+      # This must be the .tex file
       if [[ -n "$input_tex" ]]; then
         echo "Error: only one .tex file can be provided" >&2
         echo "Usage: $(basename "$0") [-log] [-keep] <file.tex>" >&2
@@ -32,60 +40,83 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Validate that a .tex file was provided
 if [[ -z "$input_tex" ]]; then
+  echo "Error: no .tex file provided" >&2
   echo "Usage: $(basename "$0") [-log] [-keep] <file.tex>" >&2
   exit 1
 fi
 
+# Validate that the file exists
 if [[ ! -f "$input_tex" ]]; then
   echo "Error: file not found: $input_tex" >&2
   exit 1
 fi
 
-if [[ "${input_tex##*.}" != "tex" ]]; then
-  echo "Error: argument must be a .tex file" >&2
+# Validate that the file has a .tex extension
+file_extension="${input_tex##*.}"
+if [[ "$file_extension" != "tex" ]]; then
+  echo "Error: argument must be a .tex file (got: .${file_extension})" >&2
   exit 1
 fi
 
+# Extract directory and filename information
 tex_abs_dir="$(cd "$(dirname "$input_tex")" && pwd)"
 tex_file="$(basename "$input_tex")"
 tex_name="${tex_file%.tex}"
 
+echo "TeX file: $tex_file"
+echo "TeX directory: $tex_abs_dir"
+echo "Output name: $tex_name"
+
+# Check that Docker is installed
 if ! command -v docker >/dev/null 2>&1; then
   echo "Error: docker is not available in PATH" >&2
   exit 1
 fi
 
-# Build the Docker image if not already built
-docker build -t latex-pdf-clean:latest "$(dirname "$(readlink -f "$0")")/" >/dev/null 2>&1
+# Build the Docker image (or reuse if already exists)
+#echo "Building/checking Docker image..."
+#docker build -t latex-pdf-clean:latest "$(dirname "$(readlink -f "$0")")/" >/dev/null 2>&1
 
-# Compile in the TeX file directory, regardless of current shell directory.
+# Compile the .tex file inside Docker container
+echo "Compiling LaTeX document..."
 docker run --rm -v "$tex_abs_dir:/data" latex-pdf-clean:latest "$tex_file"
 
+# Clean up intermediate files (unless -keep was specified)
 if [[ "$keep_all" != true ]]; then
-  # Keep only the PDF and source files.
-  rm -f \
-    "$tex_abs_dir/$tex_name.aux" \
-    "$tex_abs_dir/$tex_name.nav" \
-    "$tex_abs_dir/$tex_name.out" \
-    "$tex_abs_dir/$tex_name.snm" \
-    "$tex_abs_dir/$tex_name.toc" \
-    "$tex_abs_dir/$tex_name.vrb" \
-    "$tex_abs_dir/$tex_name.fls" \
-    "$tex_abs_dir/$tex_name.fdb_latexmk" \
-    "$tex_abs_dir/$tex_name.synctex.gz" \
-    "$tex_abs_dir/$tex_name.bbl" \
-    "$tex_abs_dir/$tex_name.blg" \
-    "$tex_abs_dir/$tex_name.bcf" \
-    "$tex_abs_dir/$tex_name.run.xml"
+  echo "Cleaning up intermediate files..."
+  
+  # Remove LaTeX auxiliary files
+  rm -f "$tex_abs_dir"/*.aux
+  rm -f "$tex_abs_dir/$tex_name.nlo"
+  rm -f "$tex_abs_dir/$tex_name.nav"
+  rm -f "$tex_abs_dir/$tex_name.out"
+  rm -f "$tex_abs_dir/$tex_name.snm"
+  rm -f "$tex_abs_dir/$tex_name.toc"
+  rm -f "$tex_abs_dir/$tex_name.vrb"
+  rm -f "$tex_abs_dir/$tex_name.fls"
+  rm -f "$tex_abs_dir/$tex_name.fdb_latexmk"
+  rm -f "$tex_abs_dir/$tex_name.synctex.gz"
+  rm -f "$tex_abs_dir/$tex_name.bbl"
+  rm -f "$tex_abs_dir/$tex_name.blg"
+  rm -f "$tex_abs_dir/$tex_name.bcf"
+  rm -f "$tex_abs_dir/$tex_name.run.xml"
 fi
 
+# Output the result
+echo "Compilation complete!"
+
 if [[ "$keep_log" == true ]]; then
-  echo "$tex_abs_dir/$tex_name.pdf"
-  echo "$tex_abs_dir/$tex_name.log"
+  # Output both PDF and log file paths
+  echo "PDF: $tex_abs_dir/$tex_name.pdf"
+  echo "Log: $tex_abs_dir/$tex_name.log"
 else
+  # Remove log file unless -keep was specified
   if [[ "$keep_all" != true ]]; then
     rm -f "$tex_abs_dir/$tex_name.log"
   fi
-  echo "$tex_abs_dir/$tex_name.pdf"
+  
+  # Output PDF file path
+  echo "PDF: $tex_abs_dir/$tex_name.pdf"
 fi
