@@ -1,13 +1,13 @@
 # latex-pdf-clean
 
-Small Bash utility to compile a single `.tex` file to PDF using Docker (`blang/latex`) and then remove common LaTeX temporary files.
+Small Bash utility to compile a single `.tex` file to PDF using Docker (latest TeX Live) and then remove common LaTeX temporary files.
 
 ## Requirements
 
 - `bash`
 - `docker` available in `PATH`
 - A local `.tex` file
-- Docker image: `blang/latex` (pulled automatically by Docker if needed)
+- Docker (latest TeX Live image will be built automatically on first run)
 
 ## Install on Linux (after cloning)
 
@@ -60,7 +60,7 @@ If Docker needs `sudo` on your machine, either run with `sudo` or add your user 
 4. Runs:
 
 	```bash
-	docker run --rm -v "<tex_dir>:/data" blang/latex pdflatex "<file.tex>"
+	docker run --rm -v "<tex_dir>:/data" latex-pdf-clean:latest "<file.tex>"
 	```
 
 5. Removes common auxiliary files:

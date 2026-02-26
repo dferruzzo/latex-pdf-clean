@@ -56,8 +56,11 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
+# Build the Docker image if not already built
+docker build -t latex-pdf-clean:latest "$(dirname "$(readlink -f "$0")")/" >/dev/null 2>&1
+
 # Compile in the TeX file directory, regardless of current shell directory.
-docker run --rm -v "$tex_abs_dir:/data" blang/latex pdflatex "$tex_file"
+docker run --rm -v "$tex_abs_dir:/data" latex-pdf-clean:latest "$tex_file"
 
 if [[ "$keep_all" != true ]]; then
   # Keep only the PDF and source files.
