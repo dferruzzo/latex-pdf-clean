@@ -7,6 +7,7 @@ set -euo pipefail
 keep_log=false          # Whether to keep the .log file
 keep_all=false          # Whether to keep all intermediate files
 input_tex=""            # The input .tex file path
+latex_image="${LATEX_IMAGE:-dferruzzo/latex:latest}" # Docker image to use
 
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
@@ -68,6 +69,7 @@ tex_name="${tex_file%.tex}"
 echo "TeX file: $tex_file"
 echo "TeX directory: $tex_abs_dir"
 echo "Output name: $tex_name"
+echo "Docker image: $latex_image"
 
 # Check that Docker is installed
 if ! command -v docker >/dev/null 2>&1; then
@@ -85,7 +87,7 @@ docker run --rm \
   --user "$(id -u):$(id -g)" \
   -v "$tex_abs_dir:/data" \
   --entrypoint latexmk \
-  latex-pdf-clean:latest \
+  "$latex_image" \
   -pdf \
   -interaction=nonstopmode \
   -file-line-error \

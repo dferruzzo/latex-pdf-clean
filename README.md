@@ -7,7 +7,7 @@ Small Bash utility to compile a single `.tex` file to PDF using Docker (latest T
 - `bash`
 - `docker` available in `PATH`
 - A local `.tex` file
-- Docker (latest TeX Live image will be built automatically on first run)
+- Docker access to pull `dferruzzo/latex:latest` from Docker Hub
 
 ## Install on Linux (after cloning)
 
@@ -39,11 +39,19 @@ latex-pdf-clean your-file.tex
 
 If Docker needs `sudo` on your machine, either run with `sudo` or add your user to the `docker` group.
 
+## Dockerfile note
+
+The script runs the published image `dferruzzo/latex:latest` by default, so `Dockerfile` is not required for day-to-day use.
+Keep `Dockerfile` if you want to rebuild, customize, or republish the image.
+
 ## Usage
 
 ```bash
 ./latex-pdf-clean [-log] [-keep] <file.tex>
 ```
+
+Default Docker image: `dferruzzo/latex:latest`.
+You can override it with the `LATEX_IMAGE` environment variable.
 
 ### Options
 
@@ -60,9 +68,10 @@ If Docker needs `sudo` on your machine, either run with `sudo` or add your user 
 4. Runs `latexmk` in Docker (with your host user UID/GID), for example:
 
 	```bash
-	docker run --rm --user "$(id -u):$(id -g)" -v "<tex_dir>:/data" --entrypoint latexmk latex-pdf-clean:latest -pdf <file.tex>
+	docker run --rm --user "$(id -u):$(id -g)" -v "<tex_dir>:/data" --entrypoint latexmk dferruzzo/latex:latest -pdf <file.tex>
 	```
 
+	If the image is not present locally, Docker will pull it automatically.
 	This ensures generated files are owned by your user (not `root`) and bibliography/cross-references are resolved automatically.
 
 5. Removes common auxiliary files:
@@ -97,6 +106,12 @@ Compile and keep all generated files:
 
 ```bash
 ./latex-pdf-clean -keep report.tex
+```
+
+Compile with a custom image tag:
+
+```bash
+LATEX_IMAGE=dferruzzo/latex:v1 ./latex-pdf-clean report.tex
 ```
 
 ## Error cases
