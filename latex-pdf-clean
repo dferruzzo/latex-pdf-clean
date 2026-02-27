@@ -84,7 +84,12 @@ echo "Compiling LaTeX document..."
 docker run --rm \
   --user "$(id -u):$(id -g)" \
   -v "$tex_abs_dir:/data" \
-  latex-pdf-clean:latest "$tex_file"
+  --entrypoint latexmk \
+  latex-pdf-clean:latest \
+  -pdf \
+  -interaction=nonstopmode \
+  -file-line-error \
+  "$tex_file"
 
 # Clean up intermediate files (unless -keep was specified)
 if [[ "$keep_all" != true ]]; then

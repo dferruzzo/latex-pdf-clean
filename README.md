@@ -57,11 +57,13 @@ If Docker needs `sudo` on your machine, either run with `sudo` or add your user 
 	- rejects unknown options
 2. Verifies the input file exists and has `.tex` extension.
 3. Verifies `docker` is installed.
-4. Runs:
+4. Runs `latexmk` in Docker (with your host user UID/GID), for example:
 
 	```bash
-	docker run --rm -v "<tex_dir>:/data" latex-pdf-clean:latest "<file.tex>"
+	docker run --rm --user "$(id -u):$(id -g)" -v "<tex_dir>:/data" --entrypoint latexmk latex-pdf-clean:latest -pdf <file.tex>
 	```
+
+	This ensures generated files are owned by your user (not `root`) and bibliography/cross-references are resolved automatically.
 
 5. Removes common auxiliary files:
 

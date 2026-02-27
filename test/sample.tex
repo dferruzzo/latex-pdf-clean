@@ -1,4 +1,40 @@
 \documentclass{article}
+\usepackage{graphicx}
+
+\title{Sample LaTeX Document for latex-pdf-clean Testing}
+\author{Your Name}
+\date{\today}
+
 \begin{document}
+\maketitle
+
 Hello from latex-pdf-clean test.
+
+As shown in Figure~\ref{fig:test-figure}, this document now includes a figure.
+It also includes a bibliographical citation~\cite{lamport1994latex}.
+
+\begin{figure}[ht]
+	\centering
+    \includegraphics[width=0.5\textwidth]{test-figure.jpeg}
+	\caption{Test figure placeholder for build validation}
+	\label{fig:test-figure}
+\end{figure}
+
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{lcr}
+		\hline
+		Item & Quantity & Price \\
+		\hline
+		Pencils & 10 & 5.00 \\
+		Notebooks & 4 & 12.00 \\
+		Erasers & 6 & 2.50 \\
+		\hline
+	\end{tabular}
+	\caption{Sample table for test coverage}
+	\label{tab:sample-data}
+\end{table}
+
+\bibliographystyle{plain}
+\bibliography{sample}
 \end{document}
