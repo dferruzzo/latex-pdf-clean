@@ -81,7 +81,10 @@ fi
 
 # Compile the .tex file inside Docker container
 echo "Compiling LaTeX document..."
-docker run --rm -v "$tex_abs_dir:/data" latex-pdf-clean:latest "$tex_file"
+docker run --rm \
+  --user "$(id -u):$(id -g)" \
+  -v "$tex_abs_dir:/data" \
+  latex-pdf-clean:latest "$tex_file"
 
 # Clean up intermediate files (unless -keep was specified)
 if [[ "$keep_all" != true ]]; then
@@ -90,6 +93,7 @@ if [[ "$keep_all" != true ]]; then
   # Remove LaTeX auxiliary files
   rm -f "$tex_abs_dir"/*.aux
   rm -f "$tex_abs_dir/$tex_name.nlo"
+    rm -f "$tex_abs_dir/$tex_name.dvi"
   rm -f "$tex_abs_dir/$tex_name.nav"
   rm -f "$tex_abs_dir/$tex_name.out"
   rm -f "$tex_abs_dir/$tex_name.snm"
