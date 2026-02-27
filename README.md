@@ -4,12 +4,19 @@ Small Bash utility to compile a single `.tex` file to PDF using Docker (latest T
 
 ## Requirements
 
+### Linux/macOS
 - `bash`
 - `docker` available in `PATH`
 - A local `.tex` file
 - Docker access to pull `dferruzzo/latex:latest` from Docker Hub
 
-## Install on Linux (after cloning)
+### Windows
+- PowerShell 5.1 or later (built into Windows 10/11)
+- Docker Desktop for Windows
+- A local `.tex` file
+- Docker access to pull `dferruzzo/latex:latest` from Docker Hub
+
+## Install on Linux/macOS (after cloning)
 
 From the project folder:
 
@@ -39,6 +46,41 @@ latex-pdf-clean your-file.tex
 
 If Docker needs `sudo` on your machine, either run with `sudo` or add your user to the `docker` group.
 
+## Install on Windows (after cloning)
+
+### Automatic Installation (Recommended)
+
+From the project folder in PowerShell:
+
+```powershell
+.\Install-Windows.ps1
+```
+
+This will:
+- Install `latex-pdf-clean.ps1` to `$HOME\bin`
+- Add it to your PATH automatically
+- Verify Docker is installed
+
+After installation, restart your terminal and run from anywhere:
+
+```powershell
+latex-pdf-clean.ps1 your-file.tex
+```
+
+### Manual Installation
+
+1. Copy `latex-pdf-clean.ps1` to a directory in your PATH (e.g., `C:\Users\YourName\bin`)
+2. Add that directory to your PATH if needed
+3. Run from anywhere: `latex-pdf-clean.ps1 your-file.tex`
+
+### Alternative: Use from project folder
+
+Without installation, run from the project folder:
+
+```powershell
+.\latex-pdf-clean.ps1 your-file.tex
+```
+
 ## Dockerfile note
 
 The script runs the published image `dferruzzo/latex:latest` by default, so `Dockerfile` is not required for day-to-day use.
@@ -46,8 +88,16 @@ Keep `Dockerfile` if you want to rebuild, customize, or republish the image.
 
 ## Usage
 
+### Linux/macOS
+
 ```bash
 ./latex-pdf-clean [-log] [-keep] <file.tex>
+```
+
+### Windows (PowerShell)
+
+```powershell
+latex-pdf-clean.ps1 [-KeepLog] [-KeepAll] <file.tex>
 ```
 
 Default Docker image: `dferruzzo/latex:latest`.
@@ -55,8 +105,13 @@ You can override it with the `LATEX_IMAGE` environment variable.
 
 ### Options
 
+**Linux/macOS:**
 - `-log`: keep the generated `.log` file
 - `-keep`: keep all generated files (skip cleanup after compile)
+
+**Windows (PowerShell):**
+- `-KeepLog`: keep the generated `.log` file
+- `-KeepAll`: keep all generated files (skip cleanup after compile)
 
 ## What it does
 
@@ -90,6 +145,8 @@ You can override it with the `LATEX_IMAGE` environment variable.
 
 ## Examples
 
+### Linux/macOS
+
 Compile and remove log:
 
 ```bash
@@ -97,6 +154,36 @@ Compile and remove log:
 ```
 
 Compile and keep log:
+
+```bash
+./latex-pdf-clean -log report.tex
+```
+
+Keep all files:
+
+```bash
+./latex-pdf-clean -keep report.tex
+```
+
+### Windows (PowerShell)
+
+Compile and remove log:
+
+```powershell
+latex-pdf-clean.ps1 report.tex
+```
+
+Compile and keep log:
+
+```powershell
+latex-pdf-clean.ps1 -KeepLog report.tex
+```
+
+Keep all files:
+
+```powershell
+latex-pdf-clean.ps1 -KeepAll report.tex
+```
 
 ```bash
 ./latex-pdf-clean -log report.tex

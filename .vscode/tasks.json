@@ -1,0 +1,74 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "LaTeX: Compile to PDF",
+            "type": "shell",
+            "command": "${workspaceFolder}/latex-pdf-clean.ps1",
+            "args": [
+                "${file}"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "clear": true
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "LaTeX: Compile and Keep Log",
+            "type": "shell",
+            "command": "${workspaceFolder}/latex-pdf-clean.ps1",
+            "args": [
+                "-KeepLog",
+                "${file}"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "clear": true
+            },
+            "group": "build"
+        },
+        {
+            "label": "LaTeX: Compile and Keep All Files",
+            "type": "shell",
+            "command": "${workspaceFolder}/latex-pdf-clean.ps1",
+            "args": [
+                "-KeepAll",
+                "${file}"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": false,
+                "clear": true
+            },
+            "group": "build"
+        },
+        {
+            "label": "LaTeX: Test with sample.tex",
+            "type": "shell",
+            "command": "${workspaceFolder}/latex-pdf-clean.ps1",
+            "args": [
+                "${workspaceFolder}/test/sample.tex"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": true,
+                "clear": true
+            },
+            "group": "test"
+        }
+    ]
+}
